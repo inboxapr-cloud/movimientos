@@ -1,27 +1,20 @@
-name: Deploy to Firebase Hosting on push
+# Settings to manage and configure a Firebase App Hosting backend.
+# https://firebase.google.com/docs/app-hosting/configure
+runConfig:
+  minInstances: 2
+  maxInstances: 100
+  concurrency: 100
+  cpu: 2
+  memoryMiB: 1024
+backend:
+  id: container-tracker-me5sv
+  region: us-central1
+rewrites:
+  - source: /.*
+    destination: /__next/server_build
+headers:
+  - source: /_next/static/**
+    headers:
+      - key: Cache-Control
+        value: 'public, max-age=31536000, immutable'
 
-on:
-  push:
-    branches:
-      - firebase-hosting-setup
-
-jobs:
-  build_and_deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-
-      - name: Deploy to Firebase Hosting
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: firebase deploy --only hosting
